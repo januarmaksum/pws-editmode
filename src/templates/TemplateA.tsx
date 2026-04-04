@@ -8,6 +8,7 @@ type Props = {
 };
 
 export const TemplateA: React.FC<Props> = ({ slots }) => {
+  console.log('slots: ', slots);
   const getSlot = (id: string) => slots.find((s) => s.slotId === id);
 
   return (

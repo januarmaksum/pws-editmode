@@ -501,28 +501,35 @@ export default function DemoPage() {
 
 ### 🚧 Dikerjakan Selanjutnya (Issue #8)
 
-- [ ] **Phase 8 — Sidebar UX Fix**
-  - [ ] Hapus backdrop `div` dari `EditorSidebar.tsx`
-  - [ ] Sidebar hanya bisa ditutup via tombol × atau Save
+- [x] **Phase 8 — Sidebar UX Fix**
+  - [x] Hapus backdrop `div` dari `EditorSidebar.tsx`
+  - [x] Sidebar hanya bisa ditutup via tombol × atau Save
 
-- [ ] **Phase 9 — Zustand Persist**
-  - [ ] Tambahkan `persist` dari `zustand/middleware` ke `editorStore.ts`
-  - [ ] Gunakan `partialize` — hanya persist `activeConfig`
-  - [ ] Gunakan `onRehydrateStorage` untuk sync `draftConfig` setelah rehydration
-  - [ ] Verifikasi Save → Reload → config tetap
+- [x] **Phase 9 — Zustand Persist**
+  - [x] Tambahkan `persist` dari `zustand/middleware` ke `editorStore.ts`
+  - [x] Gunakan `partialize` — hanya persist `activeConfig`
+  - [x] Gunakan `onRehydrateStorage` untuk sync `draftConfig` setelah rehydration
+  - [x] Verifikasi Save → Reload → config tetap
 
-- [ ] **Phase 10 — Live Config Preview**
-  - [ ] Buat `src/components/editor/ConfigPreview.tsx`
-  - [ ] Tampilkan `draftConfig.slots` sebagai `{ slotId, blocks }[]`
-  - [ ] Collapsible, collapsed by default
-  - [ ] Pasang di `EditorSidebar.tsx` di bawah `<SlotList />`
+- [x] **Phase 10 — Live Config Preview**
+  - [x] Buat `src/components/editor/ConfigPreview.tsx`
+  - [x] Tampilkan `draftConfig.slots` sebagai `{ slotId, blocks }[]`
+  - [x] Collapsible, collapsed by default
+  - [x] Pasang di `EditorSidebar.tsx` di bawah `<SlotList />`
 
-- [ ] **Verifikasi Akhir**
-  - [ ] Klik luar sidebar → tidak menutup ✓
-  - [ ] Tidak ada blur effect di background ✓
-  - [ ] DnD → JSON preview ter-update real-time ✓
-  - [ ] Save → Reload → urutan config persisted ✓
-  - [ ] `yarn lint` dan `tsc --noEmit` → 0 error ✓
+- [x] **Verifikasi Akhir**
+  - [x] Klik luar sidebar → tidak menutup ✓
+  - [x] Tidak ada blur effect di background ✓
+  - [x] DnD → JSON preview ter-update real-time ✓
+  - [x] Save → Reload → urutan config persisted ✓
+  - [x] `yarn lint` dan `tsc --noEmit` → 0 error ✓
+
+---
+
+### 🚀 Berikutnya (Issue #11)
+
+- [ ] **Phase 11 — Dynamic Template Layout**
+  - [ ] Refactor `TemplateA.tsx` agar urutan wrapper HTML dirender melooping array `slots`.
 
 ---
 
@@ -622,6 +629,109 @@ export const ConfigPreview = () => {
 
 ---
 
+## Feature: Dynamic Template Layout (Issue #11)
+
+> **Tujuan feature ini:** Memastikan bahwa ketika user mengubah urutan slot (e.g. menyeret Footer ke atas Header) di sidebar, urutan dirender-nya layout wrapper HTML di screen juga berubah mengikuti urutan array tersebut.
+
+### Phase 11 — Refactor `TemplateA.tsx`
+
+**File:** `src/templates/TemplateA.tsx`
+
+Sekarang komponen `TemplateA` masih me-render DOM layout secara hardcoded:
+
+```tsx
+<header> {getSlot('header')} </header>
+<main> {getSlot('sidebar')} {getSlot('content')} </main>
+<footer> {getSlot('footer')} </footer>
+```
+
+Hal ini menyebabkan urutan JSON array reordering tidak berdampak pada urutan HTML di layar.
+
+**Instruksi Refactor:**
+
+1. Hapus wrapper layout yang hardcoded (header, main, aside, section, footer).
+2. Buat fungsi helper `renderSlotWrapper(slot)` yang menerima satu objek config slot, dan mengembalikan JSX wrapper spesifiknya.
+3. Looping nilai props `slots` dari parent secara urut dengan fungsi helper tersebut:
+
+```tsx
+// src/templates/TemplateA.tsx
+export const TemplateA: React.FC<Props> = ({ slots }) => {
+  const renderSlotWrapper = (slot: SlotConfig) => {
+    const hasComponents = slot.components && slot.components.length > 0;
+    const content = hasComponents ? (
+      slot.components.map((comp) => (
+        <ComponentRenderer key={comp.id} config={comp} />
+      ))
+    ) : (
+      <div className="p-4 text-center text-sm text-zinc-400 italic">
+        Empty {slot.slotId} slot
+      </div>
+    );
+
+    switch (slot.slotId) {
+      case 'header':
+        return (
+          <header
+            key={slot.slotId}
+            className="sticky top-0 z-10 w-full shrink-0 border-b bg-white px-6 py-4"
+          >
+            {content}
+          </header>
+        );
+      case 'sidebar':
+        // Diubah menjadi lebar w-full di md agar tampil penuh saat dilooping linear
+        return (
+          <aside
+            key={slot.slotId}
+            className="mx-auto h-fit w-full max-w-7xl shrink-0 rounded-xl border bg-white p-4"
+          >
+            <div className="mb-4 text-sm font-semibold tracking-wider text-zinc-500 uppercase">
+              Sidebar
+            </div>
+            {content}
+          </aside>
+        );
+      case 'content':
+        return (
+          <section
+            key={slot.slotId}
+            className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-6"
+          >
+            {content}
+          </section>
+        );
+      case 'footer':
+        return (
+          <footer
+            key={slot.slotId}
+            className="mt-auto w-full shrink-0 bg-zinc-900 px-6 py-12 text-zinc-400"
+          >
+            <div className="mx-auto max-w-7xl">{content}</div>
+          </footer>
+        );
+      default:
+        return (
+          <div
+            key={slot.slotId}
+            className="mx-auto w-full max-w-7xl border border-dashed border-zinc-300 p-4"
+          >
+            {content}
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col gap-6 bg-zinc-50">
+      {/* Semua slot dirender secara dinamis mengikuti urutannya di JSON state */}
+      {slots.map((slot) => renderSlotWrapper(slot))}
+    </div>
+  );
+};
+```
+
+---
+
 ## Catatan Penting untuk AI Agent / Junior Developer
 
 - **Baca `node_modules/next/dist/docs/`** sebelum menulis kode Next.js — versi ini memiliki breaking changes.
@@ -635,3 +745,4 @@ export const ConfigPreview = () => {
 - Gunakan `arrayMove` dari `@dnd-kit/sortable` untuk menghitung urutan baru setelah drag.
 - Import `persist` dari `zustand/middleware` — bukan `zustand/middleware/persist`.
 - Urutan compose middleware: `persist(immer(...))` — bukan `immer(persist(...))`.
+- **Apabila setiap kali generate/edit code apapun, pastikan selalu run `yarn format` setelahnya.**

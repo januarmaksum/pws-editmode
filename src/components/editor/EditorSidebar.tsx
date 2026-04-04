@@ -23,20 +23,20 @@ const SlotList = dynamic(
   }
 );
 
+const ConfigPreview = dynamic(
+  () =>
+    import('@/components/editor/ConfigPreview').then(
+      (mod) => mod.ConfigPreview
+    ),
+  { ssr: false }
+);
+
 export const EditorSidebar = () => {
   const isSidebarOpen = useEditorStore((s) => s.isSidebarOpen);
   const closeSidebar = useEditorStore((s) => s.closeSidebar);
 
   return (
     <>
-      {/* Backdrop */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 z-45 bg-black/20 backdrop-blur-[2px] transition-opacity duration-300"
-          onClick={closeSidebar}
-        />
-      )}
-
       {/* Sidebar */}
       <aside
         className={`fixed top-0 right-0 z-50 h-full w-85 border-l border-gray-100 bg-white shadow-2xl transition-transform duration-300 ease-in-out ${
@@ -61,7 +61,8 @@ export const EditorSidebar = () => {
           </div>
 
           <div className="mt-8 border-t border-gray-50 pt-6">
-            <p className="text-center text-xs text-gray-400 italic">
+            <ConfigPreview />
+            <p className="mt-4 text-center text-[10px] text-gray-400 italic">
               Drag and drop slots to reorder the page layout.
             </p>
           </div>
