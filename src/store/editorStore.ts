@@ -18,6 +18,7 @@ type EditorStore = {
   reorderComponents: (slotId: string, newComponents: ComponentConfig[]) => void;
   saveConfig: () => void;
   resetDraft: () => void;
+  setInitialConfig: (config: PageConfig) => void;
 };
 
 export const useEditorStore = create<EditorStore>()(
@@ -57,6 +58,11 @@ export const useEditorStore = create<EditorStore>()(
       resetDraft: () =>
         set((state) => {
           state.draftConfig = JSON.parse(JSON.stringify(state.activeConfig));
+        }),
+      setInitialConfig: (config) =>
+        set((state) => {
+          state.activeConfig = config;
+          state.draftConfig = JSON.parse(JSON.stringify(config));
         }),
     })),
     {

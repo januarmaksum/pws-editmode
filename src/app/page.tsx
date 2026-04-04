@@ -1,24 +1,32 @@
-'use client';
+import { EditablePageContent } from '@/components/editor/EditablePageContent';
+import { PageContent } from '@/components/editor/PageContent';
+import { checkAuth, fetchPageConfig } from '@/lib/mock/api';
+import type { PageConfig } from '@/types/schema';
 
-import dynamic from 'next/dynamic';
+// This is a Server Component in Next.js 15
+export default async function DemoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const params = await searchParams;
+  const editmode = params.editmode === 'true';
 
-import { EditorSidebar } from '@/components/editor/EditorSidebar';
-import { EditorToolbar } from '@/components/editor/EditorToolbar';
+  // Fetch data on the server
+  const [isAuth, serverConfig] = await Promise.all([
+    checkAuth(),
+    fetchPageConfig() as Promise<PageConfig>,
+  ]);
 
-const PageContent = dynamic(
-  () =>
-    import('@/components/editor/PageContent').then((mod) => mod.PageContent),
-  { ssr: false }
-);
+  // Logic: Show editor if authenticated and editmode is true
+  if (isAuth && editmode) {
+    return <EditablePageContent initialConfig={serverConfig} />;
+  }
 
-export default function DemoPage() {
+  // Public View: Just the page content, No Editor Components
   return (
     <div className="relative min-h-screen bg-gray-50/30">
-      <PageContent />
-
-      {/* Editor Components */}
-      <EditorSidebar />
-      <EditorToolbar />
+      <PageContent config={serverConfig} />
     </div>
   );
 }
