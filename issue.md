@@ -153,7 +153,7 @@ type PageConfig = {
 
 ---
 
-## Milestone Awal (Sudah Selesai)
+## Milestone (Status)
 
 - [x] **Phase 1 — Foundation**
   - [x] Definisi TypeScript types + Zod schema untuk `PageConfig`
@@ -166,6 +166,24 @@ type PageConfig = {
 
 - [x] **Phase 3 — Templates**
   - [x] Buat `TemplateA` (layout 1 kolom dengan beberapa slot)
+
+- [x] **Phase 4 — Zustand Editor Store** _(Issue #6)_
+  - [x] Buat `src/lib/mock/pageConfig.ts`
+  - [x] Buat `src/store/editorStore.ts` dengan state + actions
+
+- [x] **Phase 5 — Komponen Editor** _(Issue #6)_
+  - [x] `EditorSidebar.tsx` — sidebar slide-in dari kanan
+  - [x] `SlotList.tsx` — DnD reordering dengan `@dnd-kit/sortable`
+  - [x] `SlotItem.tsx` — draggable card per slot
+  - [x] `EditorToolbar.tsx` — tombol Edit + Save floating
+
+- [x] **Phase 6 — Integrasi Page** _(Issue #6)_
+  - [x] Update `src/app/page.tsx` ke Client Component
+  - [x] Baca `activeConfig` dari Zustand
+
+- [x] **Phase 7 — Hydration Fix** _(Issue #6)_
+  - [x] Gunakan `next/dynamic` + `ssr: false` untuk `SlotList`
+  - [x] Gunakan `useId()` dari React untuk stable DnD context ID
 
 ---
 
@@ -459,43 +477,258 @@ export default function DemoPage() {
 
 ## Checklist Implementasi
 
-Gunakan checklist ini untuk melacak progress pengerjaan feature:
+### ✅ Sudah Selesai (Issue #6)
 
-- [ ] **Phase 4 — Zustand Store**
-  - [ ] Buat file `src/lib/mock/pageConfig.ts` — pindahkan mock data dari `page.tsx`
-  - [ ] Buat file `src/store/editorStore.ts` dengan semua state dan actions yang disebutkan
-  - [ ] Pastikan `draftConfig` di-initialize dengan deep clone dari `mockPageConfig`
+- [x] **Phase 4 — Zustand Store**
+  - [x] Buat `src/lib/mock/pageConfig.ts`
+  - [x] Buat `src/store/editorStore.ts` (state + actions)
+  - [x] `draftConfig` di-initialize dengan deep clone dari `activeConfig`
 
-- [ ] **Phase 5 — Komponen Editor**
-  - [ ] Buat `src/components/editor/EditorSidebar.tsx`
-    - [ ] Sidebar bisa dibuka dan ditutup (animasi slide)
-    - [ ] Membaca state `isSidebarOpen` dari Zustand
-  - [ ] Buat `src/components/editor/SlotList.tsx`
-    - [ ] Render semua slot dari `draftConfig`
-    - [ ] DnD reordering dengan `@dnd-kit/sortable`
-    - [ ] `onDragEnd` memanggil `reorderSlots()`
-  - [ ] Buat `src/components/editor/SlotItem.tsx`
-    - [ ] Implementasi `useSortable`
-    - [ ] Tampilkan nama slot, jumlah komponen, preview tipe komponen
-    - [ ] Drag handle dengan `GripVertical` icon
-    - [ ] Visual state saat `isDragging`
-  - [ ] Buat `src/components/editor/EditorToolbar.tsx`
-    - [ ] Tombol "Edit" → `openSidebar()`
-    - [ ] Tombol "Save" → `saveConfig()` + `closeSidebar()`
+- [x] **Phase 5 — Komponen Editor**
+  - [x] `EditorSidebar.tsx` — sidebar slide-in, tombol close
+  - [x] `SlotList.tsx` — DnD dengan `@dnd-kit/sortable`, `next/dynamic` + `ssr: false`
+  - [x] `SlotItem.tsx` — `useSortable`, `GripVertical`, visual drag state
+  - [x] `EditorToolbar.tsx` — tombol Edit + Save
 
-- [ ] **Phase 6 — Integrasi Page**
-  - [ ] Update `src/app/page.tsx`
-    - [ ] Tambahkan `'use client'` directive
-    - [ ] Baca `activeConfig` dari Zustand store
-    - [ ] Render `<EditorSidebar />` dan `<EditorToolbar />`
+- [x] **Phase 6 — Integrasi Page**
+  - [x] `page.tsx` → Client Component, baca `activeConfig` dari Zustand
 
-- [ ] **Verifikasi**
-  - [ ] Sidebar bisa dibuka dan ditutup tanpa error
-  - [ ] Slot tampil sebagai list di sidebar berdasarkan urutan mock data
-  - [ ] Slot bisa di-reorder via drag-and-drop
-  - [ ] Tombol Save mengapply perubahan urutan ke tampilan halaman
-  - [ ] Tidak ada TypeScript error (`tsc --noEmit`)
-  - [ ] Kode lolos lint dan format (`eslint --max-warnings=0` + Prettier)
+- [x] **Phase 7 — Hydration Fix**
+  - [x] `next/dynamic` + `ssr: false` untuk `SlotList`
+  - [x] `useId()` untuk stable DnD context ID
+
+---
+
+### 🚧 Dikerjakan Selanjutnya (Issue #8)
+
+- [x] **Phase 8 — Sidebar UX Fix**
+  - [x] Hapus backdrop `div` dari `EditorSidebar.tsx`
+  - [x] Sidebar hanya bisa ditutup via tombol × atau Save
+
+- [x] **Phase 9 — Zustand Persist**
+  - [x] Tambahkan `persist` dari `zustand/middleware` ke `editorStore.ts`
+  - [x] Gunakan `partialize` — hanya persist `activeConfig`
+  - [x] Gunakan `onRehydrateStorage` untuk sync `draftConfig` setelah rehydration
+  - [x] Verifikasi Save → Reload → config tetap
+
+- [x] **Phase 10 — Live Config Preview**
+  - [x] Buat `src/components/editor/ConfigPreview.tsx`
+  - [x] Tampilkan `draftConfig.slots` sebagai `{ slotId, blocks }[]`
+  - [x] Collapsible, collapsed by default
+  - [x] Pasang di `EditorSidebar.tsx` di bawah `<SlotList />`
+
+- [x] **Verifikasi Akhir**
+  - [x] Klik luar sidebar → tidak menutup ✓
+  - [x] Tidak ada blur effect di background ✓
+  - [x] DnD → JSON preview ter-update real-time ✓
+  - [x] Save → Reload → urutan config persisted ✓
+  - [x] `yarn lint` dan `tsc --noEmit` → 0 error ✓
+
+---
+
+### 🚀 Berikutnya (Issue #11)
+
+- [ ] **Phase 11 — Dynamic Template Layout**
+  - [ ] Refactor `TemplateA.tsx` agar urutan wrapper HTML dirender melooping array `slots`.
+
+---
+
+## Feature: Edit Mode UX Polish (Issue #8)
+
+> **Tujuan feature ini:** Menyempurnakan Edit Mode Sidebar dengan tiga improvement: sidebar behavior, persist config, dan live config preview.
+
+### Phase 8 — Sidebar UX Fix
+
+**File:** `src/components/editor/EditorSidebar.tsx`
+
+Hapus seluruh blok `{/* Backdrop */}`. Sidebar tidak lagi menutup saat area di luarnya diklik. Tidak ada overlay blur.
+
+---
+
+### Phase 9 — Zustand Persist Middleware
+
+**File:** `src/store/editorStore.ts`
+
+- Import `persist` dari `zustand/middleware` (sudah tersedia, tidak perlu install baru)
+- Compose: `persist(immer(...), options)` — **urutan ini wajib**
+- `partialize` hanya menyimpan `activeConfig` ke localStorage
+- `onRehydrateStorage` untuk sync `draftConfig` setelah rehydration
+
+```ts
+import { persist } from 'zustand/middleware';
+
+export const useEditorStore = create<EditorStore>()(
+  persist(
+    immer((set) => ({
+      /* state & actions — tidak perlu diubah */
+    })),
+    {
+      name: 'pws-editor-config',
+      partialize: (state) => ({ activeConfig: state.activeConfig }),
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.draftConfig = JSON.parse(JSON.stringify(state.activeConfig));
+        }
+      },
+    }
+  )
+);
+```
+
+> **Migrasi ke real API:** Hapus wrapper `persist(...)` dan opsinya. Logic store tidak perlu diubah.
+
+---
+
+### Phase 10 — Live Config Preview
+
+**File baru:** `src/components/editor/ConfigPreview.tsx`
+
+- Baca `draftConfig.slots` dari Zustand (reactive otomatis)
+- Tampilkan sebagai `{ slotId, blocks }[]` dalam `<pre>` block
+- Collapsible, collapsed by default
+- Tidak perlu `useEffect` — Zustand sudah reactive
+
+```tsx
+'use client';
+
+import { useState } from 'react';
+
+import { ChevronDown, ChevronRight } from 'lucide-react';
+
+import { useEditorStore } from '@/store/editorStore';
+
+export const ConfigPreview = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const slots = useEditorStore((s) => s.draftConfig.slots);
+
+  const preview = {
+    slots: slots.map((s) => ({
+      slotId: s.slotId,
+      blocks: s.components.length,
+    })),
+  };
+
+  return (
+    <div className="rounded-lg border border-gray-100">
+      <button
+        onClick={() => setIsOpen((v) => !v)}
+        className="flex w-full items-center justify-between p-3 text-xs font-bold tracking-widest text-gray-400 uppercase"
+      >
+        <span>JSON Preview</span>
+        {isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+      </button>
+      {isOpen && (
+        <pre className="overflow-x-auto rounded-b-lg bg-gray-50 p-3 text-[11px] leading-relaxed text-gray-600">
+          {JSON.stringify(preview, null, 2)}
+        </pre>
+      )}
+    </div>
+  );
+};
+```
+
+---
+
+## Feature: Dynamic Template Layout (Issue #11)
+
+> **Tujuan feature ini:** Memastikan bahwa ketika user mengubah urutan slot (e.g. menyeret Footer ke atas Header) di sidebar, urutan dirender-nya layout wrapper HTML di screen juga berubah mengikuti urutan array tersebut.
+
+### Phase 11 — Refactor `TemplateA.tsx`
+
+**File:** `src/templates/TemplateA.tsx`
+
+Sekarang komponen `TemplateA` masih me-render DOM layout secara hardcoded:
+
+```tsx
+<header> {getSlot('header')} </header>
+<main> {getSlot('sidebar')} {getSlot('content')} </main>
+<footer> {getSlot('footer')} </footer>
+```
+
+Hal ini menyebabkan urutan JSON array reordering tidak berdampak pada urutan HTML di layar.
+
+**Instruksi Refactor:**
+
+1. Hapus wrapper layout yang hardcoded (header, main, aside, section, footer).
+2. Buat fungsi helper `renderSlotWrapper(slot)` yang menerima satu objek config slot, dan mengembalikan JSX wrapper spesifiknya.
+3. Looping nilai props `slots` dari parent secara urut dengan fungsi helper tersebut:
+
+```tsx
+// src/templates/TemplateA.tsx
+export const TemplateA: React.FC<Props> = ({ slots }) => {
+  const renderSlotWrapper = (slot: SlotConfig) => {
+    const hasComponents = slot.components && slot.components.length > 0;
+    const content = hasComponents ? (
+      slot.components.map((comp) => (
+        <ComponentRenderer key={comp.id} config={comp} />
+      ))
+    ) : (
+      <div className="p-4 text-center text-sm text-zinc-400 italic">
+        Empty {slot.slotId} slot
+      </div>
+    );
+
+    switch (slot.slotId) {
+      case 'header':
+        return (
+          <header
+            key={slot.slotId}
+            className="sticky top-0 z-10 w-full shrink-0 border-b bg-white px-6 py-4"
+          >
+            {content}
+          </header>
+        );
+      case 'sidebar':
+        // Diubah menjadi lebar w-full di md agar tampil penuh saat dilooping linear
+        return (
+          <aside
+            key={slot.slotId}
+            className="mx-auto h-fit w-full max-w-7xl shrink-0 rounded-xl border bg-white p-4"
+          >
+            <div className="mb-4 text-sm font-semibold tracking-wider text-zinc-500 uppercase">
+              Sidebar
+            </div>
+            {content}
+          </aside>
+        );
+      case 'content':
+        return (
+          <section
+            key={slot.slotId}
+            className="mx-auto w-full max-w-7xl flex-1 space-y-6 p-6"
+          >
+            {content}
+          </section>
+        );
+      case 'footer':
+        return (
+          <footer
+            key={slot.slotId}
+            className="mt-auto w-full shrink-0 bg-zinc-900 px-6 py-12 text-zinc-400"
+          >
+            <div className="mx-auto max-w-7xl">{content}</div>
+          </footer>
+        );
+      default:
+        return (
+          <div
+            key={slot.slotId}
+            className="mx-auto w-full max-w-7xl border border-dashed border-zinc-300 p-4"
+          >
+            {content}
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col gap-6 bg-zinc-50">
+      {/* Semua slot dirender secara dinamis mengikuti urutannya di JSON state */}
+      {slots.map((slot) => renderSlotWrapper(slot))}
+    </div>
+  );
+};
+```
 
 ---
 
@@ -510,3 +743,6 @@ Gunakan checklist ini untuk melacak progress pengerjaan feature:
 - Pastikan setiap komponen baru menggunakan `'use client'` directive jika menggunakan hooks atau event handler.
 - Sidebar harus menggunakan `position: fixed` agar berada di atas seluruh konten halaman.
 - Gunakan `arrayMove` dari `@dnd-kit/sortable` untuk menghitung urutan baru setelah drag.
+- Import `persist` dari `zustand/middleware` — bukan `zustand/middleware/persist`.
+- Urutan compose middleware: `persist(immer(...))` — bukan `immer(persist(...))`.
+- **Apabila setiap kali generate/edit code apapun, pastikan selalu run `yarn format` setelahnya.**
