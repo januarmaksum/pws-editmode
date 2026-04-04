@@ -54,42 +54,51 @@ User tenant melihat halaman yang sudah dikustomisasi
 
 ---
 
-## Struktur Direktori yang Diantisipasi
+## Struktur Direktori (Terbaru)
 
 ```
 src/
 ├── app/
-│   ├── layout.tsx               # Root layout
-│   ├── page.tsx                 # Landing / dev sandbox
-│   └── [tenant]/               # Route per tenant (future)
+│   ├── layout.tsx               # Root layout (Global template/fonts)
+│   ├── page.tsx                 # Entry point (Handles SSR & Edit Mode toggle)
+│   ├── loading.tsx              # Fallback UI saat transisi route
+│   ├── globals.css              # Global styles & Tailwind layers
+│   └── [tenant]/                # (TODO) Dynamic Tenant Routing
+│       └── [[...slug]]/
+│           └── page.tsx         # Catch-all route untuk multi-page per tenant
 │
 ├── components/
-│   ├── ui/                      # Shadcn/UI primitives (accordion, button, dll.)
-│   ├── blocks/                  # Komponen yang bisa di-inject ke template
-│   │   ├── CardInfo/
-│   │   ├── SlideBanner/
-│   │   └── index.ts             # Registry semua blocks
-│   └── editor/                  # UI untuk edit mode
-│       ├── EditorSidebar.tsx    # Sidebar overlay utama (buka/tutup)
-│       ├── SlotList.tsx         # List slot yang dapat di-reorder via DnD
-│       ├── SlotItem.tsx         # Item slot tunggal (placeholder draggable)
-│       └── EditorToolbar.tsx    # Tombol toggle sidebar + tombol Save
+│   ├── ui/                      # Shadcn/UI primitives (low-level components)
+│   ├── blocks/                  # Komponen bisnis/widget (CardInfo, SlideBanner, dll.)
+│   │   └── index.tsx            # Registry untuk mapping JSON type -> React component
+│   └── editor/                  # Fitur-fitur khusus Edit Mode
+│       ├── EditorSidebar.tsx    # Panel samping untuk kontrol layout
+│       ├── SlotList.tsx         # Sortable area untuk slot
+│       ├── SlotItem.tsx         # Wrapper draggable untuk tiap slot
+│       ├── ComponentItem.tsx    # Wrapper untuk komponen di dalam slot
+│       ├── EditorToolbar.tsx    # Bar navigasi atas (Toggle & Save)
+│       ├── PageContent.tsx      # Viewer utama yang merender PageConfig
+│       ├── EditablePageContent.tsx # Wrapper editor untuk manipulasi slot
+│       └── ConfigPreview.tsx    # Live JSON viewer untuk debugging
 │
-├── templates/                   # Template predefined A, B, C, dst.
-│   ├── TemplateA/
-│   ├── TemplateB/
-│   └── index.ts                 # Registry semua template
+├── templates/                   # Kerangka layout halaman
+│   ├── TemplateA/               # Struktur spesifik untuk TemplateA
+│   │   ├── index.tsx            # Main layout component
+│   │   ├── config.ts            # (Optional) Konfigurasi spesifik template
+│   │   └── styles.css           # (Optional) Styling lokal / design system template
+│   └── index.ts                 # Registry semua template layout
 │
 ├── lib/
-│   ├── utils.ts
-│   ├── renderer.tsx             # Core: ComponentRenderer (JSON → React)
-│   └── schema/                  # Zod schema untuk validasi JSON config
+│   ├── renderer.tsx             # Inti engine: mengonversi JSON Config ke React Tree
+│   ├── schema/                  # Validasi JSON PageConfig menggunakan Zod
+│   ├── mock/                    # Mock API & Data untuk simulasi database
+│   └── utils.ts                 # Helper umum (cn, formatting, dll.)
 │
 ├── store/
-│   └── editorStore.ts           # Zustand store untuk editor state
+│   └── editorStore.ts           # Global state menggunakan Zustand + Persist + Immer
 │
 └── types/
-    └── schema.ts                # TypeScript types untuk JSON config
+    └── schema.ts                # Kontrak TypeScript (Interfaces) untuk PageConfig
 ```
 
 ---
@@ -98,19 +107,19 @@ src/
 
 ```ts
 // types/schema.ts
-type ComponentConfig = {
+export type ComponentConfig = {
   id: string; // nanoid — unique per instance
   type: string; // nama komponen, e.g. "CardInfo", "SlideBanner"
   props: Record<string, unknown>; // props yang diteruskan ke komponen
   children?: ComponentConfig[]; // nested components (opsional)
 };
 
-type SlotConfig = {
+export type SlotConfig = {
   slotId: string;
   components: ComponentConfig[];
 };
 
-type PageConfig = {
+export type PageConfig = {
   templateId: string; // e.g. "TemplateA"
   slots: SlotConfig[];
   meta?: {
@@ -122,6 +131,37 @@ type PageConfig = {
 
 ---
 
+## Best Practices & Saran untuk Rendering Dinamis
+
+Untuk mendukung kebutuhan multi-page dan multi-tenant (contoh: Tenant A menggunakan Template B dengan halaman `home`, `about`, `products`, `contact`), direkomendasikan pendekatan berikut:
+
+### 1. Struktur URL Berbasis Slug (Dynamic Routing)
+
+Gunakan _catch-all segments_ bawaan Next.js App Router: `app/[tenant]/[[...slug]]/page.tsx`.
+
+- `/[tenant]/` -> Secara otomatis mengenali root halaman tenant (Home).
+- `/[tenant]/about` -> Parameter `slug` berisi `['about']`.
+- `/[tenant]/products/shoes` -> Parameter `slug` berisi `['products', 'shoes']`.
+
+### 2. Resolusi PageConfig via Database
+
+Di dalam `page.tsx`, gunakan `params.tenant` dan `params.slug` untuk mendeteksi halaman apa yang sedang diakses.
+
+- Query database: `SELECT * FROM tenant_pages WHERE tenant_id = ? AND slug = ?;`
+- Mengembalikan **PageConfig** yang spesifik untuk halaman tersebut.
+- Hal ini berarti _sebuah tenant dapat memiliki banyak halaman (banyak PageConfig), dan masing-masing halaman dapat menggunakan Template yang berbeda-beda_.
+
+### 3. Skalabilitas Template
+
+Karena `templateId` terikat langsung di level `PageConfig` (bukan di level tenant secara glonal), fleksibilitas maksimal tercapai:
+
+- Halaman `Home` bisa menggunakan `TemplateLandingPage` (banyak slide/animasi).
+- Halaman `About` dan `Contact` bisa menggunakan `TemplateArticle` (berbasis text/content reader).
+
+Hal ini membuat CMS (Edit Mode) tetap konsisten. Edit Mode sidebar nantinya hanya dimuat (di-_mount_) memodifikasi satu `PageConfig` untuk _URL yang sedang diakses_.
+
+---
+
 ## Tech Stack
 
 | Library           | Versi    | Peran                                      |
@@ -129,15 +169,17 @@ type PageConfig = {
 | Next.js           | 16.2.2   | Framework utama (App Router)               |
 | React             | 19.2.4   | UI rendering                               |
 | TypeScript        | ^5       | Type safety                                |
-| Zustand           | ^5       | State management editor (drag state, dll.) |
+| Zustand           | ^5.0.12  | State management editor (Global state)     |
+| @tanstack/query   | ^5       | Fetching data & caching (Client-side)      |
+| axios             | ^1       | HTTP Client untuk REST API                 |
 | @dnd-kit          | ^6 / ^10 | Drag & Drop urutan slot di sidebar         |
-| Zod               | ^4       | Validasi JSON config schema                |
+| Zod               | ^4.3.6   | Validasi JSON config schema                |
 | Shadcn/UI + Radix | latest   | UI primitives (button, dialog, dll.)       |
-| immer             | ^11      | Immutable state updates untuk JSON config  |
-| nanoid            | ^5       | Generate unique ID per komponen instance   |
+| immer             | ^11.1.4  | Immutable state updates untuk JSON config  |
+| nanoid            | ^5.1.7   | Generate unique ID per komponen instance   |
 | Tailwind CSS      | ^4       | Styling utility                            |
-| dayjs             | ^1       | Formatting tanggal (untuk komponen konten) |
-| React Hook Form   | ^7       | Form di panel properti editor              |
+| dayjs             | ^1.11.20 | Formatting tanggal (untuk komponen konten) |
+| React Hook Form   | ^7.72.1  | Form di panel properti editor              |
 
 ---
 
@@ -161,8 +203,7 @@ type PageConfig = {
 - Husky + lint-staged aktif: setiap commit harus lolos **Prettier** + **ESLint** (`--max-warnings=0`).
 - Jangan gunakan `useState` untuk state editor level atas — **semuanya harus melalui Zustand**.
 - Pastikan setiap komponen baru menggunakan `'use client'` directive jika menggunakan hooks atau event handler.
-- Sidebar harus menggunakan `position: fixed` agar berada di atas seluruh konten halaman.
 - Gunakan `arrayMove` dari `@dnd-kit/sortable` untuk menghitung urutan baru setelah drag.
 - Import `persist` dari `zustand/middleware` — bukan `zustand/middleware/persist`.
 - Urutan compose middleware: `persist(immer(...))` — bukan `immer(persist(...))`.
-- **Apabila setiap kali generate/edit code apapun, pastikan selalu run `yarn format` setelahnya.**
+- **Apabila setiap kali generate/edit code apapun, pastikan selalu run `yarn lint-fix` dan `yarn format` setelahnya.**
