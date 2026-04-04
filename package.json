@@ -9,12 +9,13 @@
     "lint": "eslint . --max-warnings=0",
     "lint-fix": "yarn lint --fix",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "eslint --max-warnings=0"
+      "eslint --max-warnings=0 --fix --cache"
     ],
     "*.{json,css,md}": [
       "prettier --write"
