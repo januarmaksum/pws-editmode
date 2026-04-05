@@ -1,6 +1,5 @@
 import { apiClient } from '@/api/client';
-
-import { PageConfig } from './types';
+import { PageConfig } from '@/services/cms/pages/types';
 
 export const CMS_PAGES = '/cms/pages';
 

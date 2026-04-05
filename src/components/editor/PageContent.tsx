@@ -1,4 +1,4 @@
-import type { PageConfig } from '@/services/cms/pages';
+import type { PageConfig } from '@/services/cms/pages/types';
 import { TemplateRegistry } from '@/templates';
 
 export const PageContent = ({ config }: { config: PageConfig }) => {

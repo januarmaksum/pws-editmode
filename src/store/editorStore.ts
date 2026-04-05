@@ -7,7 +7,7 @@ import type {
   ComponentConfig,
   PageConfig,
   SlotConfig,
-} from '@/services/cms/pages';
+} from '@/services/cms/pages/types';
 
 type EditorStore = {
   isSidebarOpen: boolean;

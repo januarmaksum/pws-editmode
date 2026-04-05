@@ -18,7 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { ChevronDown, ChevronRight, GripVertical, Plus } from 'lucide-react';
 
 import { ComponentItem } from '@/components/editor/ComponentItem';
-import type { SlotConfig } from '@/services/cms/pages';
+import type { SlotConfig } from '@/services/cms/pages/types';
 import { useEditorStore } from '@/store/editorStore';
 
 type Props = {

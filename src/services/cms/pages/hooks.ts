@@ -2,8 +2,9 @@
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { PageConfig } from '@/services/cms/pages/types';
+
 import { CMS_PAGES, getPageConfig } from './fetch';
-import { PageConfig } from './types';
 
 /**
  * Custom hooks for the Page Service.
