@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { ComponentRenderer } from '@/lib/renderer';
-import type { SlotConfig } from '@/types/schema';
+import type { SlotConfig } from '@/services/cms/pages';
 
 type Props = {
   slots: SlotConfig[];

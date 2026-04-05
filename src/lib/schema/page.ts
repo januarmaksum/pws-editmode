@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ComponentConfig } from '@/types/schema';
+import type { ComponentConfig } from '@/services/cms/pages';
 
 export const ComponentConfigSchema: z.ZodType<ComponentConfig> = z.lazy(() =>
   z.object({

@@ -24,11 +24,11 @@ Membangun sistem **"Elementor-lite"** di Next.js yang memungkinkan kustomisasi U
 
 Komponen berdiri sendiri yang bisa diinjeksi ke dalam slot template:
 
-| Komponen      | Deskripsi                                     |
-| ------------- | --------------------------------------------- |
-| `CardInfo`    | Kartu informasi (teks, ikon, nilai statistik) |
-| `SlideBanner` | Banner slider/carousel gambar atau konten     |
-| `(dst.)`      | Komponen tambahan sesuai kebutuhan tenant     |
+| Komponen     | Deskripsi                                     |
+| ------------ | --------------------------------------------- |
+| `CardInfo`   | Kartu informasi (teks, ikon, nilai statistik) |
+| `CTA Banner` | CTA Banner                                    |
+| `(dst.)`     | Komponen tambahan sesuai kebutuhan tenant     |
 
 ### 4. Drag & Drop (DnD)
 
@@ -101,36 +101,6 @@ src/
     └── schema.ts                # Kontrak TypeScript (Interfaces) untuk PageConfig
 ```
 
----
-
-## JSON Config Schema (Contoh)
-
-```ts
-// types/schema.ts
-export type ComponentConfig = {
-  id: string; // nanoid — unique per instance
-  type: string; // nama komponen, e.g. "CardInfo", "SlideBanner"
-  props: Record<string, unknown>; // props yang diteruskan ke komponen
-  children?: ComponentConfig[]; // nested components (opsional)
-};
-
-export type SlotConfig = {
-  slotId: string;
-  components: ComponentConfig[];
-};
-
-export type PageConfig = {
-  templateId: string; // e.g. "TemplateA"
-  slots: SlotConfig[];
-  meta?: {
-    title?: string;
-    theme?: string;
-  };
-};
-```
-
----
-
 ## Best Practices & Saran untuk Rendering Dinamis
 
 Untuk mendukung kebutuhan multi-page dan multi-tenant (contoh: Tenant A menggunakan Template B dengan halaman `home`, `about`, `products`, `contact`), direkomendasikan pendekatan berikut:
@@ -145,9 +115,6 @@ Gunakan _catch-all segments_ bawaan Next.js App Router: `app/[tenant]/[[...slug]
 
 ### 2. Resolusi PageConfig via Database
 
-Di dalam `page.tsx`, gunakan `params.tenant` dan `params.slug` untuk mendeteksi halaman apa yang sedang diakses.
-
-- Query database: `SELECT * FROM tenant_pages WHERE tenant_id = ? AND slug = ?;`
 - Mengembalikan **PageConfig** yang spesifik untuk halaman tersebut.
 - Hal ini berarti _sebuah tenant dapat memiliki banyak halaman (banyak PageConfig), dan masing-masing halaman dapat menggunakan Template yang berbeda-beda_.
 
@@ -200,7 +167,7 @@ Hal ini membuat CMS (Edit Mode) tetap konsisten. Edit Mode sidebar nantinya hany
 - `@dnd-kit` sudah terinstall. Gunakan `@dnd-kit/core`, `@dnd-kit/sortable`, dan `@dnd-kit/utilities`.
 - Shadcn/UI components ada di `src/components/ui/` — jangan install ulang yang sudah ada.
 - Import alias `@/` sudah dikonfigurasi untuk `src/`. **Selalu gunakan alias ini**, jangan relative import.
-- Husky + lint-staged aktif: setiap commit harus lolos **Prettier** + **ESLint** (`--max-warnings=0`).
+- Husky + lint-staged aktif: setiap commit harus lolos **Prettier** + **ESLint**.
 - Jangan gunakan `useState` untuk state editor level atas — **semuanya harus melalui Zustand**.
 - Pastikan setiap komponen baru menggunakan `'use client'` directive jika menggunakan hooks atau event handler.
 - Gunakan `arrayMove` dari `@dnd-kit/sortable` untuk menghitung urutan baru setelah drag.

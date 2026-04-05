@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react';
 
+import type { PageConfig } from '@/services/cms/pages';
 import { useEditorStore } from '@/store/editorStore';
-import type { PageConfig } from '@/types/schema';
 
 import { EditorSidebar } from './EditorSidebar';
 import { EditorToolbar } from './EditorToolbar';

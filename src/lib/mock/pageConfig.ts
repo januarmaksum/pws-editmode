@@ -1,4 +1,4 @@
-import type { PageConfig } from '@/types/schema';
+import type { PageConfig } from '@/services/cms/pages';
 
 // Mock Config from Database
 export const mockPageConfig: PageConfig = {

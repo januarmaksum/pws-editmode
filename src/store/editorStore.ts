@@ -3,7 +3,11 @@ import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 import { mockPageConfig } from '@/lib/mock/pageConfig';
-import type { ComponentConfig, PageConfig, SlotConfig } from '@/types/schema';
+import type {
+  ComponentConfig,
+  PageConfig,
+  SlotConfig,
+} from '@/services/cms/pages';
 
 type EditorStore = {
   isSidebarOpen: boolean;

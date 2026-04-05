@@ -1,10 +1,12 @@
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+
 import { EditablePageContent } from '@/components/editor/EditablePageContent';
 import { PageContent } from '@/components/editor/PageContent';
-import { checkAuth, fetchPageConfig } from '@/lib/mock/api';
-import type { PageConfig } from '@/types/schema';
+import { getQueryClient } from '@/lib/get-query-client';
+import { getPageConfig } from '@/services/cms/pages/fetch';
+import { verifyDomain } from '@/services/verifyDomain';
 
-// This is a Server Component in Next.js 15
-export default async function DemoPage({
+export default async function RootPage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
@@ -12,21 +14,41 @@ export default async function DemoPage({
   const params = await searchParams;
   const editmode = params.editmode === 'true';
 
-  // Fetch data on the server
-  const [isAuth, serverConfig] = await Promise.all([
-    checkAuth(),
-    fetchPageConfig() as Promise<PageConfig>,
-  ]);
+  const queryClient = getQueryClient();
 
-  // Logic: Show editor if authenticated and editmode is true
-  if (isAuth && editmode) {
-    return <EditablePageContent initialConfig={serverConfig} />;
+  const { isSuccess, token } = await verifyDomain({
+    domain: 'localhost:3000',
+  });
+
+  let pageConfig = null;
+
+  if (isSuccess && token) {
+    try {
+      pageConfig = await getPageConfig('home', token);
+    } catch (error) {
+      console.error('Error fetching page config:', error);
+    }
   }
 
-  // Public View: Just the page content, No Editor Components
   return (
-    <div className="relative min-h-screen bg-gray-50/30">
-      <PageContent config={serverConfig} />
-    </div>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      {isSuccess && pageConfig && editmode ? (
+        <EditablePageContent initialConfig={pageConfig} />
+      ) : (
+        <div className="relative min-h-screen bg-gray-50/30">
+          {pageConfig && <PageContent config={pageConfig} />}
+          {!isSuccess && (
+            <div className="p-8 text-center text-red-500">
+              Authentication failed or Domain not verified.
+            </div>
+          )}
+          {isSuccess && !pageConfig && (
+            <div className="p-8 text-center text-red-500">
+              Failed to load page content.
+            </div>
+          )}
+        </div>
+      )}
+    </HydrationBoundary>
   );
 }
