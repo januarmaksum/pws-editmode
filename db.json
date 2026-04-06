@@ -1,0 +1,84 @@
+{
+  "auth": {
+    "verify-domain": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0ZW5hbnRJZCI6MSwiY29tcGFueUlkIjoiUFdTLTAwMSIsImNvbXBhbnlOYW1lIjoiUFdTIE1lbWJlciBEZWZhdWx0IiwibG9nbyI6Imh0dHBzOi8vcHdzLmlkL2Fzc2V0cy9sb2dvLWRhcmsucG5nIiwiZG9tYWluIjoibG9jYWxob3N0OjMwMDAiLCJpYXQiOjE3NzU0NDIwOTh9.zi-rOp2BQqJgg_3PjpsDgkTxSoVfQJZBsjfKcOvfvws",
+      "tenant": {
+        "companyId": "PWS-001",
+        "companyName": "PWS Member Default",
+        "logo": "https://pws.id/assets/logo-dark.png",
+        "domain": "localhost:3000"
+      }
+    }
+  },
+  "cms": {
+    "pages": {
+      "home": {
+        "templateId": "TemplateA",
+        "slots": [
+          {
+            "slotId": "header",
+            "components": [
+              {
+                "id": "logo-1",
+                "type": "TestBlock",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "slotId": "content",
+            "components": [
+              {
+                "id": "banner-1",
+                "type": "SlideBanner",
+                "props": {
+                  "title": "Welcome to Elementor-Lite",
+                  "ctaText": "Explore Features",
+                  "description": "This UI is entirely driven by a JSON configuration. No hardcoded layouts, just blocks and slots."
+                }
+              },
+              {
+                "id": "stats-row",
+                "type": "TestBlock",
+                "props": {}
+              }
+            ]
+          },
+          {
+            "slotId": "sidebar",
+            "components": [
+              {
+                "id": "card-1",
+                "type": "CardInfo",
+                "props": {
+                  "icon": "👥",
+                  "title": "Active Users",
+                  "value": "1,234"
+                }
+              },
+              {
+                "id": "card-2",
+                "type": "CardInfo",
+                "props": {
+                  "icon": "💰",
+                  "title": "Total Revenue",
+                  "value": "$45,678"
+                }
+              }
+            ]
+          },
+          {
+            "slotId": "footer",
+            "components": [
+              {
+                "id": "footer-text",
+                "type": "TestBlock",
+                "props": {}
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "/api/auth/verify-domain": "/auth/verify-domain",
+  "/api/cms/pages/:slug": "/cms/pages/:slug"
+}

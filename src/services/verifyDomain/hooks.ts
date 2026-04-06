@@ -1,17 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { AUTH_VERIFY_DOMAIN, VerifyDomainResult, verifyDomain } from './fetch';
-import { VerifyDomainRequest } from './types';
 
 /**
  * Custom hooks for the Auth Service.
- * Domain Verification - POST
+ * Domain Verification – tidak perlu parameter domain lagi (mock selalu return data sama).
  */
 export const useVerifyDomain = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<VerifyDomainResult, Error, VerifyDomainRequest>({
-    mutationFn: (data) => verifyDomain(data),
+  return useMutation<VerifyDomainResult, Error>({
+    mutationFn: () => verifyDomain(),
     onSuccess: (result) => {
       if (result.isSuccess) {
         queryClient.setQueryData([AUTH_VERIFY_DOMAIN], result);

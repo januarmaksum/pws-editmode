@@ -5,16 +5,11 @@ export const CMS_PAGES = '/cms/pages';
 
 /**
  * Fetch functions for Page Service
+ * Reads mock data from the local json mock server (mock-server.cjs).
  */
 export const getPageConfig = async (
-  slug: string = 'home',
-  token: string = ''
+  slug: string = 'home'
 ): Promise<PageConfig> => {
-  const { data } = await apiClient.get<PageConfig>(`${CMS_PAGES}/${slug}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+  const { data } = await apiClient.get<PageConfig>(`${CMS_PAGES}/${slug}`);
   return data;
 };

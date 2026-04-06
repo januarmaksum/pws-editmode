@@ -1,5 +1,3 @@
-import { cookies } from 'next/headers';
-
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { EditablePageContent } from '@/components/editor/EditablePageContent';
@@ -14,7 +12,7 @@ export default async function TenantPage({
   params: Promise<{ tenant: string; slug?: string[] }>;
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { tenant, slug } = await params;
+  const { slug } = await params;
   const sParams = await searchParams;
   const editmode = sParams.editmode === 'true';
 
@@ -23,38 +21,31 @@ export default async function TenantPage({
 
   const queryClient = getQueryClient();
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get('tenant_token')?.value || null;
-  const isSuccess = !!token;
-
   let pageConfig = null;
 
-  if (isSuccess && token) {
-    try {
-      pageConfig = await getPageConfig(pageSlug, token);
-      console.log('pageConfig: ', pageConfig);
-    } catch (error) {
-      console.error(`Error fetching page config for ${pageSlug}:`, error);
-    }
+  try {
+    pageConfig = await getPageConfig(pageSlug);
+    console.log('pageConfig: ', pageConfig);
+  } catch (error) {
+    console.error(`Error fetching page config for "${pageSlug}":`, error);
   }
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="flex flex-col">
-        {isSuccess && pageConfig && editmode ? (
+        {pageConfig && editmode ? (
           <EditablePageContent initialConfig={pageConfig} />
         ) : (
           <div className="relative min-h-screen bg-gray-50/30">
             {pageConfig && <PageContent config={pageConfig} />}
-            {!isSuccess && (
+            {!pageConfig && (
               <div className="p-8 text-center text-red-500">
-                Authentication failed or Domain not verified for tenant:{' '}
-                {tenant}.
-              </div>
-            )}
-            {isSuccess && !pageConfig && (
-              <div className="p-8 text-center text-red-500">
-                Failed to load page content for &quot;{pageSlug}&quot;.
+                Failed to load page content for &quot;{pageSlug}&quot;. Make
+                sure the mock server is running with{' '}
+                <code className="rounded bg-gray-100 px-1 font-mono">
+                  yarn mock
+                </code>
+                .
               </div>
             )}
           </div>
