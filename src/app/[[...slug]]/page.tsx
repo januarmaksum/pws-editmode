@@ -1,10 +1,11 @@
+import { cookies } from 'next/headers';
+
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 import { EditablePageContent } from '@/components/editor/EditablePageContent';
 import { PageContent } from '@/components/editor/PageContent';
 import { getQueryClient } from '@/lib/get-query-client';
 import { getPageConfig } from '@/services/cms/pages/fetch';
-import { verifyDomain } from '@/services/verifyDomain';
 
 export default async function TenantPage({
   params,
@@ -22,16 +23,16 @@ export default async function TenantPage({
 
   const queryClient = getQueryClient();
 
-  // In a real app, 'tenant' would be used to verify the domain or fetch tenant-specific data
-  const { isSuccess, token } = await verifyDomain({
-    domain: 'localhost:3000', // In production, this should be dynamic or derived from the request
-  });
+  const cookieStore = await cookies();
+  const token = cookieStore.get('tenant_token')?.value || null;
+  const isSuccess = !!token;
 
   let pageConfig = null;
 
   if (isSuccess && token) {
     try {
       pageConfig = await getPageConfig(pageSlug, token);
+      console.log('pageConfig: ', pageConfig);
     } catch (error) {
       console.error(`Error fetching page config for ${pageSlug}:`, error);
     }

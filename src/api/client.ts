@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { getSession } from '@/lib/common.session';
+
 /**
  * Reusable Axios Instance
  * Configure base URL and common headers here.
@@ -17,7 +19,7 @@ apiClient.interceptors.request.use(
   async (config) => {
     // Universal Cookie Access (Server vs Client handled in the util)
     // TODO: Remove this when we have a better way to handle authentication
-    const token = null;
+    const { token } = await getSession();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }

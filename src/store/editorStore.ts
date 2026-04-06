@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
-import { mockPageConfig } from '@/lib/mock/pageConfig';
 import type {
   ComponentConfig,
   PageConfig,
@@ -29,8 +28,8 @@ export const useEditorStore = create<EditorStore>()(
   persist(
     immer((set) => ({
       isSidebarOpen: false,
-      activeConfig: mockPageConfig,
-      draftConfig: JSON.parse(JSON.stringify(mockPageConfig)),
+      activeConfig: {} as PageConfig,
+      draftConfig: {} as PageConfig,
 
       toggleSidebar: () =>
         set((state) => {
