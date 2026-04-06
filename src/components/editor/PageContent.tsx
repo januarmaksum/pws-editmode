@@ -1,5 +1,5 @@
+import type { PageConfig } from '@/services/cms/pages/types';
 import { TemplateRegistry } from '@/templates';
-import type { PageConfig } from '@/types/schema';
 
 export const PageContent = ({ config }: { config: PageConfig }) => {
   const Template =

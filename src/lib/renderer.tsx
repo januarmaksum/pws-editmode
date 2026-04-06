@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { BlockRegistry } from '@/components/blocks';
-import type { ComponentConfig } from '@/types/schema';
+import type { ComponentConfig } from '@/services/cms/pages/types';
 
 type Props = {
   config: ComponentConfig;

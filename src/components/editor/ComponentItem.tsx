@@ -4,7 +4,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, MousePointer2 } from 'lucide-react';
 
-import type { ComponentConfig } from '@/types/schema';
+import type { ComponentConfig } from '@/services/cms/pages/types';
 
 type Props = {
   component: ComponentConfig;

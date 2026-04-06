@@ -1,0 +1,10 @@
+/**
+ * TemplateA specific styles.
+ * Use this file for component-level or template-level scoped styles.
+ */
+
+.template-a-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

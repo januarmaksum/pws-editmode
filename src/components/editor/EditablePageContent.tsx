@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useRef } from 'react';
 
+import type { PageConfig } from '@/services/cms/pages/types';
 import { useEditorStore } from '@/store/editorStore';
-import type { PageConfig } from '@/types/schema';
 
 import { EditorSidebar } from './EditorSidebar';
 import { EditorToolbar } from './EditorToolbar';
@@ -14,14 +14,14 @@ export const EditablePageContent = ({
 }: {
   initialConfig: PageConfig;
 }) => {
-  const setInitialConfig = useEditorStore((s) => s.setInitialConfig);
-  const activeConfig = useEditorStore((s) => s.activeConfig);
+  const initialized = useRef(false);
 
-  useEffect(() => {
-    // Initialize the store once if there's no active config or to sync with server
-    // In this simulation, we always sync the provided server config
-    setInitialConfig(initialConfig);
-  }, [initialConfig, setInitialConfig]);
+  if (!initialized.current) {
+    useEditorStore.getState().setInitialConfig(initialConfig);
+    initialized.current = true;
+  }
+
+  const activeConfig = useEditorStore((s) => s.activeConfig);
 
   return (
     <>

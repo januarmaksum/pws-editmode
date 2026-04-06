@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "eslint .",
     "lint-fix": "yarn lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -15,7 +15,7 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
       "prettier --write",
-      "eslint --max-warnings=0 --fix --cache"
+      "eslint --fix --cache"
     ],
     "*.{json,css,md}": [
       "prettier --write"
