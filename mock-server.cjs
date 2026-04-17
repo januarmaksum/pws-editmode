@@ -1,5 +1,4 @@
-// @ts-check
-/* eslint-disable @typescript-eslint/no-require-imports */
+// @ts-ignore
 /**
  * Custom mock server using json-server v1 internals.
  * Serves static data from db.json with custom routes that mirror the real API.
